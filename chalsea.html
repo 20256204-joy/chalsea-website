@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Chalsea - Undas Special</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Mono:wght@400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- Spooky Halloween Theme --- */
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-card: rgba(20, 25, 35, 0.7);
+            --text-main: #e2e8f0;
+            --accent-purple: #9333ea;
+            --accent-gold: #fbbf24;
+            --accent-blue: #60a5fa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* Starry background */
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+        }
+
+        /* --- Landing Page (Login) --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+        }
+
+        .login-box {
+            background: var(--bg-card); border: 1px solid rgba(147, 51, 234, 0.3);
+            padding: 40px 30px; border-radius: 15px; text-align: center;
+            box-shadow: 0 0 40px rgba(147, 51, 234, 0.2);
+            width: 100%; max-width: 400px; backdrop-filter: blur(10px);
+        }
+
+        .login-box h1 { margin-bottom: 10px; color: var(--accent-gold); font-family: 'Playfair Display', serif; font-style: italic; }
+        input[type="text"] {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border-radius: 6px; border: 1px solid #4b5563;
+            background: #111827; color: white; text-align: center;
+            font-family: 'Space Mono', monospace; outline: none;
+        }
+        .login-btn {
+            width: 100%; padding: 12px; background: var(--accent-purple);
+            color: white; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .login-btn:hover { background: #7e22ce; }
+
+        /* --- Main App --- */
+        #app { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding-bottom: 80px; }
+
+        /* --- Top Bar (Music) --- */
+        .top-bar { position: fixed; top: 20px; right: 20px; z-index: 100; }
+        .music-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            width: 45px; height: 45px; border-radius: 50%;
+            color: white; font-size: 1.2rem; cursor: pointer;
+            backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        .music-btn.playing { color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 15px var(--accent-gold); }
+
+        /* --- Sections --- */
+        .page-section {
+            display: none; flex: 1; flex-direction: column;
+            padding: 40px 20px; animation: fadeIn 0.5s;
+        }
+        .page-section.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- HOME PAGE --- */
+        #home { justify-content: center; align-items: center; text-align: center; }
+        .home-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .home-subtitle { font-family: 'Dancing Script', cursive; color: var(--accent-blue); font-size: 2rem; }
+        .home-title { font-family: 'Playfair Display', serif; font-size: 4.5rem; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px var(--accent-purple); margin: 10px 0; }
+        .home-name { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.5rem; color: white; }
+        .home-date { border: 1px solid #4b5563; padding: 10px 25px; border-radius: 30px; font-size: 0.9rem; letter-spacing: 2px; color: #9ca3af; margin-top: 20px; background: rgba(255,255,255,0.05); }
+
+        /* --- MESSAGE PAGE --- */
+        #message { align-items: center; justify-content: flex-start; }
+        .message-card {
+            background: var(--bg-card); border: 1px solid #374151; border-radius: 12px;
+            padding: 30px; max-width: 700px; width: 100%; margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+        }
+        .message-header { font-family: 'Playfair Display', serif; color: var(--accent-gold); font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px dashed #4b5563; padding-bottom: 10px; }
+        .typewriter-text { font-family: 'Space Mono', monospace; font-size: 0.95rem; line-height: 1.8; color: #d1d5db; min-height: 300px; }
+        .highlight { color: var(--accent-gold); font-weight: bold; }
+        .cursor { display: inline-block; width: 8px; height: 15px; background-color: var(--accent-gold); animation: blink 0.8s infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- INBOX / WISH JAR --- */
+        #inbox { align-items: center; justify-content: center; text-align: center; position: relative; }
+        .jar-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: white; margin-bottom: 10px; }
+        .jar-subtitle { color: #9ca3af; margin-bottom: 30px; }
+        
+        /* The Glass Jar CSS */
+        .jar-wrapper {
+            position: relative; width: 220px; height: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px 20px 40px 40px;
+            box-shadow: inset 0 0 30px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.8);
+            display: flex; flex-wrap: wrap; justify-content: center; align-content: center;
+            padding: 20px; gap: 15px; transition: transform 0.2s; overflow: hidden;
+        }
+        
+        /* Jar Lid */
+        .jar-lid {
+            position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 15px; background: rgba(255,255,255,0.2); border-radius: 10px;
+        }
+
+        /* Stars inside Jar */
+        .star {
+            color: var(--accent-gold); font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--accent-gold);
+            animation: floatStar 2s infinite alternate ease-in-out;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 10;
+        }
+        .star:hover { transform: scale(1.3); text-shadow: 0 0 20px var(--accent-gold), 0 0 30px #fff; }
+        @keyframes floatStar { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+
+        /* Flying Star Animation */
+        .flying-star {
+            position: fixed; color: var(--accent-gold); font-size: 2rem;
+            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--accent-gold);
+            z-index: 9999; pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Popup Wish Text */
+        .wish-display {
+            font-family: 'Dancing Script', cursive; font-size: 2rem; color: var(--accent-blue);
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5); max-width: 600px;
+            opacity: 0; transition: opacity 0.5s; margin-top: 30px; min-height: 80px;
+        }
+        .wish-display.show { opacity: 1; }
+
+        /* --- MEMORIES --- */
+        #memories { align-items: center; justify-content: flex-start; }
+        .carousel-container {
+            position: relative; width: 100%; max-width: 600px; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8); border: 1px solid #374151; margin-top: 20px;
+        }
+        .carousel-slide { display: none; width: 100%; height: 400px; position: relative; }
+        .carousel-slide.active { display: block; animation: fadeIn 0.5s; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; filter: sepia(30%) contrast(120%); }
+        .slide-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            color: white; padding: 20px; text-align: center;
+            font-family: 'Dancing Script', cursive; font-size: 1.8rem;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .carousel-slide:hover .slide-overlay, .carousel-slide:active .slide-overlay { opacity: 1; }
+        .prev, .next {
+            cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%);
+            width: 40px; height: 40px; background: rgba(0,0,0,0.6);
+            border: 1px solid #4b5563; border-radius: 50%; color: white;
+            font-size: 1.2rem; z-index: 10; display: flex; justify-content: center; align-items: center;
+        }
+        .prev { left: 10px; } .next { right: 10px; }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(147, 51, 234, 0.3);
+            display: flex; justify-content: space-around; align-items: center; z-index: 100;
+        }
+        .nav-tab {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: #6b7280; cursor: pointer; transition: 0.3s; width: 25%;
+            font-size: 0.8rem; font-family: 'Space Mono', monospace;
+        }
+        .nav-tab i { font-size: 1.4rem; }
+        .nav-tab.active { color: var(--accent-purple); text-shadow: 0 0 10px var(--accent-purple); }
+
+        /* Emoji Rain Container */
+        #emoji-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none; }
+        .falling-emoji { position: absolute; top: -50px; font-size: 2rem; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            .home-title { font-size: 3rem; }
+            .home-name { font-size: 2rem; }
+            .home-subtitle { font-size: 1.5rem; }
+            .carousel-slide { height: 250px; }
+            .jar-wrapper { width: 180px; height: 280px; }
+            .message-card { padding: 20px; }
+        }
+        audio { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>Who is this for?</h1>
+            <input type="text" id="nameInput" placeholder="Enter name..." autocomplete="off">
+            <button class="login-btn" onclick="login()">Enter</button>
+        </div>
+    </div>
+
+    <div id="emoji-rain"></div>
+
+    <!-- MAIN APP -->
+    <div id="app">
+        
+        <div class="top-bar">
+            <button class="music-btn" id="musicBtn" onclick="toggleMusic()">
+                <i class="fa-solid fa-music"></i>
+            </button>
+        </div>
+        <audio id="bgMusic" loop><source src="multo.mp3" type="audio/mpeg"></audio>
+
+        <!-- HOME SECTION -->
+        <div id="home" class="page-section active">
+            <div class="home-content">
+                <div class="home-subtitle">A Tribute to the Multo</div>
+                <div class="home-title">For Chalsea</div>
+                <div class="home-name">The One That Got Away</div>
+                <div class="home-date">NOVEMBER 1</div>
+            </div>
+        </div>
+
+        <!-- MESSAGE SECTION -->
+        <div id="message" class="page-section">
+            <div class="message-card">
+                <div class="message-header"><i class="fa-solid fa-feather-pointed"></i> A Letter For You</div>
+                <div class="typewriter-text" id="typewriter-text"></div>
+            </div>
+        </div>
+
+        <!-- INBOX / WISH JAR SECTION -->
+        <div id="inbox" class="page-section">
+            <h2 class="jar-title">A Jar of Wishes for You</h2>
+            <p class="jar-subtitle">Tap a star inside the jar to pull out a special wish 💙</p>
+            
+            <div class="jar-wrapper" id="wishJar">
+                <div class="jar-lid"></div>
+                <!-- 10 Stars inside the jar, with specific IDs -->
+                <i class="fa-solid fa-star star" id="star-0" style="animation-delay: 0.1s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-1" style="animation-delay: 0.4s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-2" style="animation-delay: 0.2s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-3" style="animation-delay: 0.6s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-4" style="animation-delay: 0.3s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-5" style="animation-delay: 0.7s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-6" style="animation-delay: 0.5s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-7" style="animation-delay: 0.9s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-8" style="animation-delay: 0.8s;" onclick="pullWish(this)"></i>
+                <i class="fa-solid fa-star star" id="star-9" style="animation-delay: 1.0s;" onclick="pullWish(this)"></i>
+            </div>
+
+            <div class="wish-display" id="wishDisplay"></div>
+        </div>
+
+        <!-- MEMORIES SECTION -->
+        <div id="memories" class="page-section">
+            <h2 class="jar-title" style="margin-bottom: 20px;">Memories</h2>
+            <div class="carousel-container">
+                <div class="carousel-slide active">
+                    <img src="cha1.jpg" alt="Memory 1">
+                    <div class="slide-overlay">"Bago siya naging multo..."</div>
+                </div>
+                <div class="carousel-slide">
+                    <img src="cha2.jpg" alt="Memory 2">
+                    <div class="slide-overlay">"Keep smiling, Chalsea! 👻"</div>
+                </div>
+                <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+                <button class="next" onclick="moveSlide(1)">&#10095;</button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <div class="bottom-nav">
+            <div class="nav-tab active" onclick="changeTab('home', this)">
+                <i class="fa-solid fa-house"></i><span>Home</span>
+            </div>
+            <div class="nav-tab" onclick="changeTab('message', this)">
+                <i class="fa-solid fa-envelope"></i><span>Message</span>
+            </div>
+            <div class="nav-tab" onclick="changeTab('inbox', this)">
+                <i class="fa-solid fa-jar"></i><span>Inbox</span>
+            </div>
+            <div class="nav-tab" onclick="changeTab('memories', this)">
+                <i class="fa-solid fa-images"></i><span>Memories</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- LOGIN ---
+        function login() {
+            const name = document.getElementById('nameInput').value.toLowerCase().trim();
+            if (name === 'chalsea') {
+                document.getElementById('login-screen').style.display = 'none';
+                startEmojiRain();
+                setTimeout(() => {
+                    document.getElementById('app').style.display = 'flex';
+                }, 1500);
+            } else {
+                alert("Oops! This is only for Chalsea.");
+            }
+        }
+        document.getElementById('nameInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // --- EMOJI RAIN ---
+        function startEmojiRain() {
+            const rain = document.getElementById('emoji-rain');
+            rain.style.display = 'block';
+            const emojis = ['⚰️', '👻', '🕯️', '🪦', '💀']; 
+            for (let i = 0; i < 40; i++) {
+                let e = document.createElement('div');
+                e.classList.add('falling-emoji');
+                e.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                e.style.left = Math.random() * 100 + 'vw';
+                e.style.animationDuration = Math.random() * 2 + 1.5 + 's';
+                e.style.fontSize = Math.random() * 1.5 + 1.5 + 'rem';
+                rain.appendChild(e);
+                setTimeout(() => { e.remove(); }, 4000);
+            }
+            setTimeout(() => { rain.style.display = 'none'; }, 4000);
+        }
+
+        // --- NAVIGATION ---
+        function changeTab(tabId, element) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+            
+            if(tabId === 'message') startTypewriter();
+        }
+
+        // --- MUSIC ---
+        const audio = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        let isPlaying = false;
+        function toggleMusic() {
+            if (!isPlaying) {
+                audio.play(); musicBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                musicBtn.classList.add('playing'); isPlaying = true;
+            } else {
+                audio.pause(); musicBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
+                musicBtn.classList.remove('playing'); isPlaying = false;
+            }
+        }
+
+        // --- WISH JAR LOGIC ---
+        const wishes = [
+            "I wish you a year filled with endless laughter and genuine joy.",
+            "May all your biggest dreams and secret goals finally come true.",
+            "Sana mahanap mo na ang taong magrereply agad-agad, hindi yung 3 business days bago ka pansinin.",
+            "Wishing you peace of mind and a future partner na hindi 'limitado' magmahal.",
+            "Sana sa susunod na taon, wala nang 'Multo'. Yung totoo na, ipapakilala ka sa pamilya niya.",
+            "Wishing you a love that doesn't make you question your worth. You deserve clarity.",
+            "I wish you the kind of peace that makes you forget why you were ever stressed.",
+            "Sana magkaroon ka ng enough courage to walk away from things that no longer serve you.",
+            "I wish you a future where you look back at this moment and smile because it led you to something better.",
+            "Lastly, I wish you the kind of love that is loud, proud, and never a secret."
+        ];
+        
+        let wishesOpened = 0;
+
+        function pullWish(starElement) {
+            // Prevent clicking the same star twice
+            if (starElement.classList.contains('opened')) return;
+
+            // 1. Mark the star as opened so it can't be clicked again
+            starElement.classList.add('opened');
+
+            // 2. Get the position of the SPECIFIC star that was clicked
+            const rect = starElement.getBoundingClientRect();
+            
+            // 3. Hide the original star instantly
+            starElement.style.opacity = '0';
+
+            // 4. Create a flying star clone at the exact same position
+            const flyingStar = document.createElement('i');
+            flyingStar.classList.add('fa-solid', 'fa-star', 'flying-star');
+            flyingStar.style.left = rect.left + 'px';
+            flyingStar.style.top = rect.top + 'px';
+            document.body.appendChild(flyingStar);
+
+            // 5. Animate the flying star to the center of the screen
+            setTimeout(() => {
+                const displayX = window.innerWidth / 2 - 15;
+                const displayY = window.innerHeight / 2 - 50;
+                flyingStar.style.left = displayX + 'px';
+                flyingStar.style.top = displayY + 'px';
+                flyingStar.style.transform = 'scale(3) rotate(360deg)';
+                flyingStar.style.opacity = '0';
+            }, 50);
+
+            // 6. Show the wish text
+            const display = document.getElementById('wishDisplay');
+            display.classList.remove('show');
+            
+            setTimeout(() => {
+                display.innerText = wishes[wishesOpened];
+                display.classList.add('show');
+                
+                // Remove flying star from DOM after animation finishes
+                setTimeout(() => flyingStar.remove(), 1000);
+            }, 800); 
+
+            // 7. Increment counter
+            wishesOpened++;
+
+            // 8. Check if all stars are opened
+            if (wishesOpened === 10) {
+                setTimeout(() => {
+                    document.querySelector('.jar-subtitle').innerText = "You've opened all the wishes! 💙";
+                    display.innerText = "The jar is empty! I hope you felt the love.";
+                }, 1500);
+            }
+        }
+
+        // --- CAROUSEL ---
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        function moveSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slideIndex += n;
+            if (slideIndex >= slides.length) slideIndex = 0;
+            if (slideIndex < 0) slideIndex = slides.length - 1;
+            slides[slideIndex].classList.add('active');
+        }
+
+        // --- TYPEWRITER EFFECT ---
+        const messageHTML = `
+            <p>Uy, Chalsea! Kumusta ka na? I know na medyo mahirap pa rin i-process ang nangyari sa inyong dalawa. Since Nov 1 na, iniisip ko na baka kailangan mo ng closure.</p>
+            <br>
+            <p>Ganito kasi 'yan, girl. That guy? He's a <span class="highlight">Multo</span>. He was there, he gave you mixed signals, made you feel special, tapos biglang naglaho na parang bula. Wag mo na siyang hanapin. 'Wag mo na siyang i-message. If he wanted to, he would. Period.</p>
+            <br>
+            <p>Alam ko na miss mo yung memories, pero tandaan mo: <b>"There is a time for everything" (Ecclesiastes 3:1)</b>. Tapos na ang season niyo, bes. It's time for your healing era.</p>
+            <br>
+            <p>Don't settle for a "mutual understanding" na ikaw lang ang nagbibigay ng malisya. You deserve someone who will claim you in public, not someone who treats you like a secret.</p>
+            <br>
+            <p><b>Proverbs 4:23</b> reminds us: <i>"Above all else, guard your heart, for everything you do flows from it."</i> Protect your peace. Wag mo hayaang multuhin ka niya.</p>
+        `;
+
+        let hasTyped = false;
+        function startTypewriter() {
+            if (hasTyped) return;
+            hasTyped = true;
+            
+            const container = document.getElementById('typewriter-text');
+            container.innerHTML = '';
+            let i = 0;
+            const speed = 20; 
+            
+            function type() {
+                if (i < messageHTML.length) {
+                    if (messageHTML.charAt(i) === '<') {
+                        let endTag = messageHTML.indexOf('>', i);
+                        if (endTag !== -1) {
+                            container.innerHTML += messageHTML.substring(i, endTag + 1);
+                            i = endTag + 1;
+                        } else {
+                            container.innerHTML += messageHTML.charAt(i); i++;
+                        }
+                    } else {
+                        container.innerHTML += messageHTML.charAt(i); i++;
+                    }
+                    
+                    container.innerHTML = container.innerHTML.replace('<span class="cursor">|</span>', '');
+                    container.innerHTML += '<span class="cursor">|</span>';
+                    container.scrollTop = container.scrollHeight;
+                    
+                    setTimeout(type, speed);
+                } else {
+                    container.innerHTML = container.innerHTML.replace('<span class="cursor">|</span>', '');
+                }
+            }
+            type();
+        }
+    </script>
+</body>
+</html>
